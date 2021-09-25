@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateApi.Models;
+using RealEstateApi.Models.Enums;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RealEstateApi.Controllers
@@ -131,6 +134,42 @@ namespace RealEstateApi.Controllers
                                     "Error updating data");
             }
         }
+
+        [HttpGet("{search}")]
+        public ActionResult<IEnumerable<RealEstate>> Search(string name, City? city, OfferType? offerType,
+            PropertyType? propertyType, double? space)
+        {
+            try
+            {
+                if(!string.IsNullOrEmpty(name))
+                {
+                    var result = appDbContext.RealEstates.Where(r => r.Name.Contains(name));
+
+                    
+
+
+                    if (result.Any())
+                    {
+                        result = result.Where(r => r.City.Equals(city) && r.PropertyType.Equals(propertyType)
+                                                && r.OfferType.Equals(offerType) && r.Space == space);
+
+                        if(result.Any())
+                            return Ok(result);
+                    }
+                }
+
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error retrieving data from the database");
+                
+            }
+        }
+            
+
+
 
 
     }
