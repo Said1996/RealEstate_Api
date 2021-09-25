@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using RealEstateApi.Models;
 using RealEstateApi.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace RealEstateApi.Controllers
@@ -136,27 +138,28 @@ namespace RealEstateApi.Controllers
         }
 
         [HttpGet("{search}")]
-        public ActionResult<IEnumerable<RealEstate>> Search(string name, City? city, OfferType? offerType,
-            PropertyType? propertyType, double? space)
+        public ActionResult<IEnumerable<RealEstate>> Search([FromQuery]FilterParameter filterParameter, [FromQuery]PaginationParameter paginationParameter)
         {
             try
             {
-                if(!string.IsNullOrEmpty(name))
+                var result = appDbContext.RealEstates.AsQueryable();
+
+                
+
+                result = Filters(filterParameter);
+
+                var metadata = new PaginationInformation()
                 {
-                    var result = appDbContext.RealEstates.Where(r => r.Name.Contains(name));
+                    PageNumber = paginationParameter.PageNumber,
+                    TotalCount = result.Count(),
+                    TotalPages = (int)((double)result.Count() / (double)paginationParameter.PageSize)
+                };
 
-                    
 
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
-                    if (result.Any())
-                    {
-                        result = result.Where(r => r.City.Equals(city) && r.PropertyType.Equals(propertyType)
-                                                && r.OfferType.Equals(offerType) && r.Space == space);
-
-                        if(result.Any())
-                            return Ok(result);
-                    }
-                }
+                if (result.Any())
+                    return Ok(result);
 
                 return NotFound();
             }
@@ -167,7 +170,23 @@ namespace RealEstateApi.Controllers
                 
             }
         }
-            
+
+        private IQueryable<RealEstate> Filters(FilterParameter filterParameter, IQueryable<RealEstate> result)
+        {
+            if (!string.IsNullOrEmpty(filterParameter?.QueryName))
+            {
+                result = appDbContext.RealEstates.Where(r => r.Name.Contains(filterParameter.QueryName));
+            }
+
+            if(filterParameter.City != null)
+            {
+                result.Where(r => r.City == filterParameter.City);
+            }
+
+
+
+            return result;
+        }
 
 
 
