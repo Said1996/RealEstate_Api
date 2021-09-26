@@ -157,7 +157,7 @@ namespace RealEstateApi.Controllers
                 {
                     PageNumber = paginationParameter.PageNumber,
                     TotalCount = result.Count(),
-                    TotalPages = TotalPages(result.Count(), paginationParameter.PageSize)
+                    TotalPages = TotalPages(query.Count(), paginationParameter.PageSize)
                 };
 
                 if (result.Any())
@@ -194,7 +194,7 @@ namespace RealEstateApi.Controllers
         private int TotalPages(int totalCount, int pageSize)
         {
             var result = 0;
-            var totalPages = Math.DivRem(pageSize, totalCount, out result);
+            var totalPages = Math.DivRem(totalCount, pageSize, out result);
             if (result != 0)
                 totalPages++;
             return totalPages;
