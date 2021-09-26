@@ -24,11 +24,14 @@ namespace RealEstateApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAllRealEstates()
+        public async Task<ActionResult> GetAllRealEstates([FromQuery]PaginationParameter paginationParameter)
         {
             try
             {
-                return Ok(await appDbContext.RealEstates.ToListAsync());
+                return Ok(await appDbContext.RealEstates
+                    .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
+                    .Take(paginationParameter.PageSize)
+                    .ToListAsync());
             }
             catch (Exception)
             {
@@ -138,28 +141,31 @@ namespace RealEstateApi.Controllers
         }
 
         [HttpGet("{search}")]
-        public ActionResult<IEnumerable<RealEstate>> Search([FromQuery]FilterParameter filterParameter, [FromQuery]PaginationParameter paginationParameter)
+        public async Task<ActionResult<IEnumerable<RealEstate>>> Search([FromQuery]FilterParameter filterParameter,
+            [FromQuery]PaginationParameter paginationParameter)
         {
             try
             {
-                var result = appDbContext.RealEstates.AsQueryable();
-
-                
-
-                result = Filters(filterParameter);
+                var query = appDbContext.RealEstates.AsQueryable();
+                query = Filters(filterParameter, query);
+                var result = await query.OrderBy(r => r.Name)
+                    .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
+                    .Take(paginationParameter.PageSize)
+                    .ToListAsync();
 
                 var metadata = new PaginationInformation()
                 {
                     PageNumber = paginationParameter.PageNumber,
                     TotalCount = result.Count(),
-                    TotalPages = (int)((double)result.Count() / (double)paginationParameter.PageSize)
+                    TotalPages = TotalPages(result.Count(), paginationParameter.PageSize)
                 };
 
-
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-
                 if (result.Any())
+                {
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
                     return Ok(result);
+                }
+
 
                 return NotFound();
             }
@@ -171,23 +177,28 @@ namespace RealEstateApi.Controllers
             }
         }
 
-        private IQueryable<RealEstate> Filters(FilterParameter filterParameter, IQueryable<RealEstate> result)
+        private IQueryable<RealEstate> Filters(FilterParameter filterParameter, IQueryable<RealEstate> query)
         {
             if (!string.IsNullOrEmpty(filterParameter?.QueryName))
             {
-                result = appDbContext.RealEstates.Where(r => r.Name.Contains(filterParameter.QueryName));
+                query = query.Where(r => r.Name.Contains(filterParameter.QueryName));
             }
 
             if(filterParameter.City != null)
             {
-                result.Where(r => r.City == filterParameter.City);
+                query = query.Where(r => r.City == filterParameter.City);
             }
-
-
-
-            return result;
+            return query;
         }
 
+        private int TotalPages(int totalCount, int pageSize)
+        {
+            var result = 0;
+            var totalPages = Math.DivRem(pageSize, totalCount, out result);
+            if (result != 0)
+                totalPages++;
+            return totalPages;
+        }
 
 
 
