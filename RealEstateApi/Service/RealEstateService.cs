@@ -94,14 +94,53 @@ namespace RealEstateApi.Service
         private IQueryable<RealEstate> Filters(FilterParameter filterParameter, IQueryable<RealEstate> query)
         {
             if (!string.IsNullOrEmpty(filterParameter?.QueryName))
-            {
                 query = query.Where(r => r.Name.Contains(filterParameter.QueryName));
-            }
 
             if (filterParameter.City != null)
-            {
                 query = query.Where(r => r.City == filterParameter.City);
-            }
+
+            if (filterParameter?.Price != null)
+                query = query.Where(r => r.Price == filterParameter.Price);
+
+            if (filterParameter?.PriceFrom != null)
+                query = query.Where(r => r.Price >= filterParameter.PriceFrom);
+
+            if (filterParameter?.PriceTo != null)
+                query = query.Where(r => r.Price <= filterParameter.PriceTo);
+
+            if (filterParameter?.MinSpace != null)
+                query = query.Where(r => r.Space >= filterParameter.MinSpace);
+
+            if (filterParameter?.MaxSpace != null)
+                query = query.Where(r => r.Space <= filterParameter.MaxSpace);
+
+            if (filterParameter?.KitchenCount != null)
+                query = query.Where(r => r.KitchenNum == filterParameter.KitchenCount);
+
+            if (filterParameter?.RoomCount != null)
+                query = query.Where(r => r.RoomNum == filterParameter.RoomCount);
+
+            if (filterParameter?.BathroomCount != null)
+                query = query.Where(r => r.BathroomNum == filterParameter.BathroomCount);
+
+            if (filterParameter?.City != null)
+                query = query.Where(r => r.City == filterParameter.City);
+
+            if (filterParameter?.PropertyType != null)
+                query = query.Where(r => r.PropertyType == filterParameter.PropertyType);
+
+            if (filterParameter?.OfferType != null)
+                query = query.Where(r => r.OfferType == filterParameter.OfferType);
+
+            if (filterParameter?.SwimmingPool != null)
+                query = query.Where(r => r.SwimmingPool == filterParameter.SwimmingPool);
+
+            if (filterParameter?.SecuritySystem != null)
+                query = query.Where(r => r.SecuritySystem == filterParameter.SecuritySystem);
+
+            if (filterParameter?.Garden != null)
+                query = query.Where(r => r.Garden == filterParameter.Garden);
+
             return query;
         }
 
