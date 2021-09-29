@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RealEstateApi.Service.Interfaces;
 
 namespace RealEstateApi.Controllers
 {
@@ -7,5 +8,11 @@ namespace RealEstateApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly IUserService userService;
+
+        public UserController(IUserService userService)
+        {
+            this.userService = userService;
+        }
     }
 }
