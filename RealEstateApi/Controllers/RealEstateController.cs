@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RealEstateApi.Models;
 using RealEstateApi.Models.Enums;
+using RealEstateApi.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,12 @@ namespace RealEstateApi.Controllers
     [ApiController]
     public class RealEstateController : ControllerBase
     {
-        private readonly AppDbContext appDbContext;
+        private readonly IRealEstateService realEstateService;
 
-        public RealEstateController(AppDbContext appDbContext)
+        public RealEstateController(IRealEstateService realEstateService)
         {
-            this.appDbContext = appDbContext;
+
+            this.realEstateService = realEstateService;
         }
 
         [HttpGet]
@@ -28,10 +30,7 @@ namespace RealEstateApi.Controllers
         {
             try
             {
-                return Ok(await appDbContext.RealEstates
-                    .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
-                    .Take(paginationParameter.PageSize)
-                    .ToListAsync());
+                return Ok(await realEstateService.GetAllRealEstateAsync(paginationParameter));
             }
             catch (Exception)
             {
@@ -45,10 +44,10 @@ namespace RealEstateApi.Controllers
         {
             try
             {
-                var result = await appDbContext.RealEstates.FirstOrDefaultAsync(r => r.Id == id);
+                var result = await realEstateService.GetRealEstateAsync(id);
 
-                if (result == null) return NotFound();
-
+                if (result == null) 
+                    return NotFound();
                 return result;
             }
             catch (Exception)
@@ -66,11 +65,10 @@ namespace RealEstateApi.Controllers
                 if (realEstate == null)
                     return BadRequest();
 
-                var rEstate = await appDbContext.RealEstates.AddAsync(realEstate);
-                appDbContext.SaveChanges();
+                var rEstate = await realEstateService.PostRealEstateAsync(realEstate);
 
                 return CreatedAtAction(nameof(GetRealEstate),
-                    new { id = rEstate.Entity.Id }, realEstate);
+                    new { id = rEstate.Id }, realEstate);
             }
             catch (Exception)
             {
@@ -84,14 +82,11 @@ namespace RealEstateApi.Controllers
         {
             try
             {
-                var realState = await appDbContext.RealEstates.FirstOrDefaultAsync(r => r.Id == id);
-                if (realState == null)
+                var done = await realEstateService.DeleteRealEstateAsync(id);
+                if (done == false)
                     return BadRequest();
 
-                appDbContext.RealEstates.Remove(realState);
-                await appDbContext.SaveChangesAsync();
-
-                return realState;
+                return NoContent();
             }
             catch (Exception)
             {
@@ -101,37 +96,14 @@ namespace RealEstateApi.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<RealEstate>> PutRealEstate(int id, RealEstate realEstate)
+        public async Task<ActionResult<RealEstate>> UpdateRealEstate(int id, RealEstate realEstate)
         {
             try
             {
                 if (realEstate.Id != id)
                     return BadRequest();
-
-                var realEstateToModify = await appDbContext.RealEstates.FirstOrDefaultAsync(r => r.Id == id);
-                if (realEstateToModify == null)
-                    return NotFound($"RealEstate with Id = {id} not found");
-
-                
-
-                realEstateToModify.Name = realEstate.Name;
-                realEstateToModify.Description = realEstate.Description;
-                realEstateToModify.Price = realEstate.Price;
-                realEstateToModify.RoomNum = realEstate.RoomNum;
-                realEstateToModify.KitchenNum = realEstate.KitchenNum;
-                realEstateToModify.PropertyType = realEstate.PropertyType;
-                realEstateToModify.Space = realEstate.Space;
-                realEstateToModify.SwimmingPool = realEstate.SwimmingPool;
-                realEstateToModify.SecuritySystem = realEstate.SecuritySystem;
-                realEstateToModify.OfferType = realEstate.OfferType;
-                realEstateToModify.BathroomNum = realEstate.BathroomNum;
-                realEstateToModify.City = realEstate.City;
-                realEstateToModify.Garden = realEstate.Garden;
-
-                await appDbContext.SaveChangesAsync();
-
+                var realEstateToModify = await realEstateService.UpdateRealEstateAsync(realEstate);
                 return realEstateToModify;
-
             }
             catch (Exception)
             {
@@ -146,18 +118,18 @@ namespace RealEstateApi.Controllers
         {
             try
             {
-                var query = appDbContext.RealEstates.AsQueryable();
-                query = Filters(filterParameter, query);
+                var query = realEstateService.Search(filterParameter, paginationParameter);
+
                 var result = await query.OrderBy(r => r.Name)
-                    .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
-                    .Take(paginationParameter.PageSize)
-                    .ToListAsync();
+               .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
+               .Take(paginationParameter.PageSize)
+               .ToListAsync();
 
                 var metadata = new PaginationInformation()
                 {
                     PageNumber = paginationParameter.PageNumber,
                     TotalCount = result.Count(),
-                    TotalPages = TotalPages(query.Count(), paginationParameter.PageSize)
+                    TotalPages = realEstateService.TotalPages(query.Count(), paginationParameter.PageSize)
                 };
 
                 if (result.Any())
@@ -177,28 +149,7 @@ namespace RealEstateApi.Controllers
             }
         }
 
-        private IQueryable<RealEstate> Filters(FilterParameter filterParameter, IQueryable<RealEstate> query)
-        {
-            if (!string.IsNullOrEmpty(filterParameter?.QueryName))
-            {
-                query = query.Where(r => r.Name.Contains(filterParameter.QueryName));
-            }
-
-            if(filterParameter.City != null)
-            {
-                query = query.Where(r => r.City == filterParameter.City);
-            }
-            return query;
-        }
-
-        private int TotalPages(int totalCount, int pageSize)
-        {
-            var result = 0;
-            var totalPages = Math.DivRem(totalCount, pageSize, out result);
-            if (result != 0)
-                totalPages++;
-            return totalPages;
-        }
+ 
 
 
 
