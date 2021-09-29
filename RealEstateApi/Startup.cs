@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using RealEstateApi.Models;
+using RealEstateApi.Service;
+using RealEstateApi.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +37,7 @@ namespace RealEstateApi
             services.AddDbContext<AppDbContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("RealestateDB")));
 
+            services.AddScoped<IRealEstateService, RealEstateService>();
 
             services.AddControllers();
 
