@@ -38,6 +38,7 @@ namespace RealEstateApi
                 options => options.UseSqlServer(Configuration.GetConnectionString("RealestateDB")));
 
             services.AddScoped<IRealEstateService, RealEstateService>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddControllers();
 
