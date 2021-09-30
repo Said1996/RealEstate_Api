@@ -1,6 +1,6 @@
 ﻿using RealEstateApi.Models.Enums;
 
-namespace RealEstateApi.Models
+namespace RealEstateApi.Models.Request
 {
     public class FilterParameter
     {

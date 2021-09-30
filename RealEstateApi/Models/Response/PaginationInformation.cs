@@ -1,4 +1,4 @@
-﻿namespace RealEstateApi.Models
+﻿namespace RealEstateApi.Models.Response
 {
     public class PaginationInformation
     {

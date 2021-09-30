@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace RealEstateApi.Models
+namespace RealEstateApi.Models.Request
 {
     public class PaginationParameter
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace RealEstateApi.Models
+namespace RealEstateApi.Models.Context
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {

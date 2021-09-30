@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RealEstateApi.Models;
 using RealEstateApi.Models.Enums;
+using RealEstateApi.Models.Request;
+using RealEstateApi.Models.Response;
 using RealEstateApi.Service.Interfaces;
 using System;
 using System.Collections.Generic;

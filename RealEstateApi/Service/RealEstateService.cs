@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RealEstateApi.Models;
+using RealEstateApi.Models.Context;
+using RealEstateApi.Models.Request;
 using RealEstateApi.Service.Interfaces;
 using System;
 using System.Collections.Generic;
