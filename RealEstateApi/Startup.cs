@@ -47,14 +47,14 @@ namespace RealEstateApi
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>();
 
-            //services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(
-            //        builder =>
-            //        {
-            //            builder.WithOrigins("https://localhost:44315");
-            //        });
-            //});
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("https://localhost:44315");
+                    });
+            });
 
             services.AddAuthentication(options =>
             {
@@ -133,7 +133,7 @@ namespace RealEstateApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            //app.UseCors();
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
