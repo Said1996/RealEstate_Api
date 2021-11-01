@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RealEstateApi.Models;
-using RealEstateApi.Models.Enums;
 using RealEstateApi.Models.Request;
 using RealEstateApi.Models.Response;
 using RealEstateApi.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 
-namespace RealEstateApi.Controllers
+namespace RealEstateApi.Controllers.V1
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class RealEstateController : ControllerBase
@@ -28,7 +28,7 @@ namespace RealEstateApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAllRealEstates([FromQuery]PaginationParameter paginationParameter)
+        public async Task<ActionResult> GetAllRealEstates([FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace RealEstateApi.Controllers
             {
                 var result = await realEstateService.GetRealEstateAsync(id);
 
-                if (result == null) 
+                if (result == null)
                     return NotFound();
                 return result;
             }
@@ -59,6 +59,7 @@ namespace RealEstateApi.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Moderator")]
         [HttpPost]
         public async Task<ActionResult<RealEstate>> PostRealEstate(RealEstate realEstate)
         {
@@ -79,6 +80,7 @@ namespace RealEstateApi.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Moderator")]
         [HttpDelete("{id:int}")]
         public async Task<ActionResult<RealEstate>> DeleteRealEstate(int id)
         {
@@ -97,6 +99,7 @@ namespace RealEstateApi.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Moderator")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult<RealEstate>> UpdateRealEstate(int id, RealEstate realEstate)
         {
@@ -115,8 +118,8 @@ namespace RealEstateApi.Controllers
         }
 
         [HttpGet("{search}")]
-        public async Task<ActionResult<IEnumerable<RealEstate>>> Search([FromQuery]FilterParameter filterParameter,
-            [FromQuery]PaginationParameter paginationParameter)
+        public async Task<ActionResult<IEnumerable<RealEstate>>> Search([FromQuery] FilterParameter filterParameter,
+            [FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
@@ -147,14 +150,14 @@ namespace RealEstateApi.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                 "Error retrieving data from the database");
-                
+
             }
         }
 
- 
+
 
 
 
     }
-    
+
 }
