@@ -44,11 +44,11 @@ namespace RealEstateApi.Service
             var realEstate = await GetRealEstateAsync(id);
             if (realEstate == null)
                 return false;
-            
+
             appDbContext.RealEstates.Remove(realEstate);
             appDbContext.SaveChanges();
             return true;
-            
+
         }
 
         public async Task<RealEstate> UpdateRealEstateAsync(RealEstate realEstate)
@@ -60,7 +60,7 @@ namespace RealEstateApi.Service
             realEstateToModify.Name = realEstate.Name;
             realEstateToModify.Description = realEstate.Description;
             realEstateToModify.Price = realEstate.Price;
-            realEstateToModify.RoomNum = realEstate.RoomNum;
+            realEstateToModify.BedroomNum = realEstate.BedroomNum;
             realEstateToModify.KitchenNum = realEstate.KitchenNum;
             realEstateToModify.PropertyType = realEstate.PropertyType;
             realEstateToModify.Space = realEstate.Space;
@@ -80,7 +80,7 @@ namespace RealEstateApi.Service
         {
             var query = appDbContext.RealEstates.AsQueryable();
             query = Filters(filterParameter, query);
-           
+
             return query;
         }
 
@@ -95,8 +95,8 @@ namespace RealEstateApi.Service
 
         private IQueryable<RealEstate> Filters(FilterParameter filterParameter, IQueryable<RealEstate> query)
         {
-            if (!string.IsNullOrEmpty(filterParameter?.QueryName))
-                query = query.Where(r => r.Name.Contains(filterParameter.QueryName));
+            if (!string.IsNullOrEmpty(filterParameter?.Search))
+                query = query.Where(r => r.Name.Contains(filterParameter.Search));
 
             if (filterParameter.City != null)
                 query = query.Where(r => r.City == filterParameter.City);
@@ -116,14 +116,14 @@ namespace RealEstateApi.Service
             if (filterParameter?.MaxSpace != null)
                 query = query.Where(r => r.Space <= filterParameter.MaxSpace);
 
-            if (filterParameter?.KitchenCount != null)
-                query = query.Where(r => r.KitchenNum == filterParameter.KitchenCount);
+            if (filterParameter?.KitchenNum != null)
+                query = query.Where(r => r.KitchenNum == filterParameter.KitchenNum);
 
-            if (filterParameter?.RoomCount != null)
-                query = query.Where(r => r.RoomNum == filterParameter.RoomCount);
+            if (filterParameter?.BedroomNum != null)
+                query = query.Where(r => r.BedroomNum == filterParameter.BedroomNum);
 
-            if (filterParameter?.BathroomCount != null)
-                query = query.Where(r => r.BathroomNum == filterParameter.BathroomCount);
+            if (filterParameter?.BathroomNum != null)
+                query = query.Where(r => r.BathroomNum == filterParameter.BathroomNum);
 
             if (filterParameter?.City != null)
                 query = query.Where(r => r.City == filterParameter.City);
@@ -146,6 +146,6 @@ namespace RealEstateApi.Service
             return query;
         }
 
-        
+
     }
 }

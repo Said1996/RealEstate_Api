@@ -4,7 +4,7 @@ namespace RealEstateApi.Models.Request
 {
     public class FilterParameter
     {
-        public string QueryName {  get; set; }
+        public string Search { get; set; }
 
         public int? Price { get; set; }
         public int? PriceFrom { get; set; }
@@ -12,9 +12,9 @@ namespace RealEstateApi.Models.Request
         public double? MaxSpace { get; set; }
         public double? MinSpace { get; set; }
 
-        public int? KitchenCount { get; set; }
-        public int? RoomCount {  get; set; }
-        public int? BathroomCount {  get; set; }
+        public int? KitchenNum { get; set; }
+        public int? BedroomNum { get; set; }
+        public int? BathroomNum { get; set; }
 
         public City? City { get; set; }
         public PropertyType? PropertyType { get; set; }

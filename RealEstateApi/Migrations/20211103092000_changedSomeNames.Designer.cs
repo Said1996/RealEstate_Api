@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealEstateApi.Models.Context;
 
 namespace RealEstateApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211103092000_changedSomeNames")]
+    partial class changedSomeNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,6 +46,15 @@ namespace RealEstateApi.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "2c5e174e-3b0e-446f-86af-483d56fd7210",
+                            ConcurrencyStamp = "a00d9b34-1a4a-47d8-b4ee-7eab01ad6c86",
+                            Name = "SuperAdmin",
+                            NormalizedName = "SUPERADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -129,6 +140,13 @@ namespace RealEstateApi.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            RoleId = "2c5e174e-3b0e-446f-86af-483d56fd7210"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -216,6 +234,25 @@ namespace RealEstateApi.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "f06326b8-f94d-4b78-a37e-0a6281482a0c",
+                            Email = "said.amir.kattan@outlook.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            Name = "Said",
+                            NormalizedEmail = "SAID.AMIR.KATTAN@OUTLOOK.COM",
+                            NormalizedUserName = "SAID.AMIR.KATTAN@OUTLOOK.COM",
+                            PasswordHash = "AQAAAAEAACcQAAAAEB/t4wmbzZGcGQTHxZXiCXRbHvVu8TQ0Vvh1AlU76UnE0BHItXkcX6QbdR+MDkB3ZQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "ee30b025-877f-43c6-b6dc-a8b388c6c863",
+                            TwoFactorEnabled = false,
+                            UserName = "said.amir.kattan@outlook.com"
+                        });
                 });
 
             modelBuilder.Entity("RealEstateApi.Models.RealEstate", b =>

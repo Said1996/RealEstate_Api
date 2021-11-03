@@ -52,7 +52,11 @@ namespace RealEstateApi
                 options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.WithOrigins("https://localhost:44315");
+                        builder.WithOrigins("https://localhost:44315")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithExposedHeaders("*");
+
                     });
             });
 
