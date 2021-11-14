@@ -78,6 +78,8 @@ namespace RealEstateApi.Service
                 authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
                 authenticationModel.Email = user.Email;
                 authenticationModel.UserName = user.UserName;
+                authenticationModel.PhoneNumber = user.PhoneNumber;
+                authenticationModel.PhotoPath = user.PhotoPath;
                 var rolesList = await userManager.GetRolesAsync(user).ConfigureAwait(false);
                 authenticationModel.Roles = rolesList.ToList();
                 return authenticationModel;
