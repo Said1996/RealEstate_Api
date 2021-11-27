@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealEstateApi.Models.Context;
 
 namespace RealEstateApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211115224842_SeedRoles")]
+    partial class SeedRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,6 +46,29 @@ namespace RealEstateApi.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "0bdc3bfd-2972-4849-9fd1-7cedc34d0d39",
+                            ConcurrencyStamp = "1a3da1db-17f5-4044-93fa-c319ca2da8fb",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "6943c106-4fde-4773-972b-2947d0eac563",
+                            ConcurrencyStamp = "fc694083-1b91-431d-a78e-6457089da7d6",
+                            Name = "Moderator",
+                            NormalizedName = "MODERATOR"
+                        },
+                        new
+                        {
+                            Id = "bfa908f6-c9db-485b-a87d-f44d55b1f3bf",
+                            ConcurrencyStamp = "eed656d6-3295-4b9c-9041-d89b60abcbbf",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -228,60 +253,46 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("BathroomNum")
+                    b.Property<int?>("BathroomNum")
                         .HasColumnType("int");
 
-                    b.Property<int>("BedroomNum")
+                    b.Property<int?>("BedroomNum")
                         .HasColumnType("int");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("City")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Garden")
+                    b.Property<bool?>("Garden")
                         .HasColumnType("bit");
 
-                    b.Property<int>("KitchenNum")
+                    b.Property<int?>("KitchenNum")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OfferType")
+                    b.Property<int?>("OfferType")
                         .HasColumnType("int");
 
-                    b.Property<string>("PhotoPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Price")
+                    b.Property<int?>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("PropertyType")
+                    b.Property<int?>("PropertyType")
                         .HasColumnType("int");
 
-                    b.Property<bool>("SecuritySystem")
+                    b.Property<bool?>("SecuritySystem")
                         .HasColumnType("bit");
 
-                    b.Property<double>("Space")
+                    b.Property<double?>("Space")
                         .HasColumnType("float");
 
-                    b.Property<bool>("SwimmingPool")
+                    b.Property<bool?>("SwimmingPool")
                         .HasColumnType("bit");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("RealEstates");
                 });
@@ -335,15 +346,6 @@ namespace RealEstateApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("RealEstateApi.Models.RealEstate", b =>
-                {
-                    b.HasOne("RealEstateApi.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

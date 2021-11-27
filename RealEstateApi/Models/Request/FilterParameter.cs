@@ -16,13 +16,18 @@ namespace RealEstateApi.Models.Request
         public int? BedroomNum { get; set; }
         public int? BathroomNum { get; set; }
 
-        public City? City { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public string Address { get; set; }
+
         public PropertyType? PropertyType { get; set; }
         public OfferType? OfferType { get; set; }
 
         public bool? SwimmingPool { get; set; }
         public bool? SecuritySystem { get; set; }
         public bool? Garden { get; set; }
+
+
 
     }
 }

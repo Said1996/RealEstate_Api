@@ -27,6 +27,7 @@ namespace RealEstateApi.Service
 
         public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, AppDbContext context)
         {
+
             this.context = context;
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -37,9 +38,9 @@ namespace RealEstateApi.Service
         {
             var user = new ApplicationUser
             {
-                UserName = model.Username,
+                UserName = model.Email,
                 Email = model.Email,
-                Name = model.FirstName,
+                Name = model.FullName,
 
             };
             var userWithSameEmail = await userManager.FindByEmailAsync(model.Email);
@@ -66,26 +67,25 @@ namespace RealEstateApi.Service
             var user = await userManager.FindByEmailAsync(tokenRequestModel.Email);
             if (user == null)
             {
-                authenticationModel.IsAuthenticated = false;
+                authenticationModel.IsSuccessful = false;
                 authenticationModel.Message = $"No Accounts Registered with {tokenRequestModel.Email}.";
                 return authenticationModel;
             }
             if (await userManager.CheckPasswordAsync(user, tokenRequestModel.Password))
             {
-
-                authenticationModel.IsAuthenticated = true;
+                authenticationModel.IsSuccessful = true;
                 JwtSecurityToken jwtSecurityToken = await CreateJwtToken(user);
                 authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
                 authenticationModel.Email = user.Email;
-                authenticationModel.UserName = user.UserName;
+                authenticationModel.FullName = user.Name;
                 authenticationModel.PhoneNumber = user.PhoneNumber;
                 authenticationModel.PhotoPath = user.PhotoPath;
-                var rolesList = await userManager.GetRolesAsync(user).ConfigureAwait(false);
-                authenticationModel.Roles = rolesList.ToList();
+                //var rolesList = await userManager.GetRolesAsync(user).ConfigureAwait(false);
+                //authenticationModel.Roles = rolesList.ToList();
                 return authenticationModel;
             }
 
-            authenticationModel.IsAuthenticated = false;
+            authenticationModel.IsSuccessful = false;
             authenticationModel.Message = $"Incorrect Credentials for user {user.Email}.";
             return authenticationModel;
         }
@@ -139,6 +139,7 @@ namespace RealEstateApi.Service
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("Name", user.Name),
                 new Claim("uid", user.Id)
             }
             .Union(userClaims)

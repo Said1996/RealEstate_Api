@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using RealEstateApi.Models;
 using RealEstateApi.Models.Request;
 using RealEstateApi.Models.Response;
 using RealEstateApi.Service.Interfaces;
@@ -42,7 +41,7 @@ namespace RealEstateApi.Controllers.V1
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<RealEstate>> GetRealEstate(int id)
+        public async Task<ActionResult<RealEstateResponse>> GetRealEstate(int id)
         {
             try
             {
@@ -59,19 +58,21 @@ namespace RealEstateApi.Controllers.V1
             }
         }
 
-        [Authorize(Roles = "Admin, Moderator")]
+        //[Authorize(Roles = "Admin, Moderator")]
         [HttpPost]
-        public async Task<ActionResult<RealEstate>> PostRealEstate(RealEstate realEstate)
+        public async Task<ActionResult<RealEstateModel>> PostRealEstate(RealEstateModel realEstateModel)
         {
             try
             {
-                if (realEstate == null)
+
+                if (realEstateModel == null)
                     return BadRequest();
 
-                var rEstate = await realEstateService.PostRealEstateAsync(realEstate);
+                var UserId = User.Claims.FirstOrDefault(c => c.Type == "uid").Value;
+                var rEstate = await realEstateService.PostRealEstateAsync(realEstateModel, UserId);
 
                 return CreatedAtAction(nameof(GetRealEstate),
-                    new { id = rEstate.Id }, realEstate);
+                    new { id = rEstate.Id }, realEstateModel);
             }
             catch (Exception)
             {
@@ -80,9 +81,9 @@ namespace RealEstateApi.Controllers.V1
             }
         }
 
-        [Authorize(Roles = "Admin, Moderator")]
+        //[Authorize(Roles = "Admin, Moderator")]
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult<RealEstate>> DeleteRealEstate(int id)
+        public async Task<ActionResult<RealEstateModel>> DeleteRealEstate(int id)
         {
             try
             {
@@ -101,14 +102,14 @@ namespace RealEstateApi.Controllers.V1
 
         [Authorize(Roles = "Admin, Moderator")]
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<RealEstate>> UpdateRealEstate(int id, RealEstate realEstate)
+        public async Task<ActionResult<RealEstateModel>> UpdateRealEstate(int id, RealEstateModel realEstateModel)
         {
             try
             {
-                if (realEstate.Id != id)
+                if (realEstateModel.Id != id)
                     return BadRequest();
-                var realEstateToModify = await realEstateService.UpdateRealEstateAsync(realEstate);
-                return realEstateToModify;
+                var realEstate = await realEstateService.UpdateRealEstateAsync(realEstateModel);
+                return realEstate;
             }
             catch (Exception)
             {
@@ -118,31 +119,18 @@ namespace RealEstateApi.Controllers.V1
         }
 
         [HttpGet("{search}")]
-        public async Task<ActionResult<IEnumerable<RealEstate>>> Search([FromQuery] FilterParameter filterParameter,
+        public async Task<ActionResult<IEnumerable<RealEstateResponse>>> Search([FromQuery] FilterParameter filterParameter,
             [FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
-                var query = realEstateService.Search(filterParameter, paginationParameter);
+                var result = realEstateService.Search(filterParameter, paginationParameter);
 
-                var result = await query.OrderBy(r => r.Name)
-               .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
-               .Take(paginationParameter.PageSize)
-               .ToListAsync();
-
-                var metadata = new PaginationInformation()
+                if (result.query.Any())
                 {
-                    PageNumber = paginationParameter.PageNumber,
-                    TotalCount = result.Count(),
-                    TotalPages = realEstateService.TotalPages(query.Count(), paginationParameter.PageSize)
-                };
-
-                if (result.Any())
-                {
-                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-                    return Ok(result);
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.pagination));
+                    return Ok(await result.query.ToListAsync());
                 }
-
 
                 return NotFound();
             }

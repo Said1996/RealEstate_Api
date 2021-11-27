@@ -1,9 +1,8 @@
 ﻿using RealEstateApi.Models.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RealEstateApi.Models
+namespace RealEstateApi.Models.Response
 {
-    public class RealEstate
+    public class RealEstateResponse
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -29,8 +28,9 @@ namespace RealEstateApi.Models
         public bool SecuritySystem { get; set; }
         public bool Garden { get; set; }
 
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        public string UserName { get; set; }
+        public string UserPhotoPath { get; set; }
+        public string UserPhoneNumber { get; set; }
 
     }
 }

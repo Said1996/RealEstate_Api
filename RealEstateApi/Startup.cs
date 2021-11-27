@@ -37,6 +37,8 @@ namespace RealEstateApi
 
             services.Configure<JWT>(Configuration.GetSection("JWT"));
 
+            services.AddAutoMapper(typeof(Startup));
+
 
             services.AddScoped<IRealEstateService, RealEstateService>();
             services.AddScoped<IUserService, UserService>();

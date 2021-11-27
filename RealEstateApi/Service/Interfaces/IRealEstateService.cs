@@ -1,5 +1,5 @@
-﻿using RealEstateApi.Models;
-using RealEstateApi.Models.Request;
+﻿using RealEstateApi.Models.Request;
+using RealEstateApi.Models.Response;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,12 +8,11 @@ namespace RealEstateApi.Service.Interfaces
 {
     public interface IRealEstateService
     {
-        Task<List<RealEstate>> GetAllRealEstateAsync(PaginationParameter paginationParameter);
-        Task<RealEstate> GetRealEstateAsync(int id);
-        Task<RealEstate> PostRealEstateAsync(RealEstate realEstate);
+        Task<List<RealEstateResponse>> GetAllRealEstateAsync(PaginationParameter paginationParameter);
+        Task<RealEstateResponse> GetRealEstateAsync(int id);
+        Task<RealEstateModel> PostRealEstateAsync(RealEstateModel realEstateModel, string userId);
         Task<bool> DeleteRealEstateAsync(int id);
-        Task<RealEstate> UpdateRealEstateAsync(RealEstate realEstate);
-        IQueryable<RealEstate> Search(FilterParameter filterParameter, PaginationParameter paginationParameter);
-        int TotalPages(int totalCount, int pageSize);
+        Task<RealEstateModel> UpdateRealEstateAsync(RealEstateModel realEstateModel);
+        (IQueryable<RealEstateResponse> query, PaginationInformation pagination) Search(FilterParameter filterParameter, PaginationParameter paginationParameter);
     }
 }

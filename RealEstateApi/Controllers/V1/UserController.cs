@@ -25,29 +25,38 @@ namespace RealEstateApi.Controllers.V1
             return Ok(result);
         }
 
-        [HttpPost("registerModel")]
+
+
+        [HttpPost("Register")]
         public async Task<ActionResult> RegisterUserAsync(RegisterModel registerModel)
         {
             var result = await userService.RegisterAsync(registerModel);
             return Ok(result);
         }
 
-        [HttpPost("token")]
-        public async Task<IActionResult> GetTokenAsync(TokenRequestModel tokenRequestModel)
+        [HttpPost("SignIn")]
+        public async Task<IActionResult> SignIn(TokenRequestModel tokenRequestModel)
         {
             var result = await userService.GetTokenAsync(tokenRequestModel);
             return Ok(result);
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> UserInfo(TokenRequestModel tokenRequestModel)
+        //{
+        //    var result = await userService.GetUserInfo(tokenRequestModel);
+        //    return Ok(result);
+        //}
+
         [Authorize(Roles = "Admin")]
-        [HttpPost("roleName:string")]
+        [HttpPost("CreateRole")]
         public async Task<IActionResult> CreateRoleAsync(string roleName)
         {
             await userService.CreateRoleAsync(roleName);
             return Ok();
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost("AddRoleToUser")]
         public async Task<ActionResult> AddRoleToUserAsync(AddRoleModel addRoleModel)
         {

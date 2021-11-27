@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealEstateApi.Models.Context;
 
 namespace RealEstateApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211115224351_testSeed1")]
+    partial class testSeed1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,60 +230,46 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("BathroomNum")
+                    b.Property<int?>("BathroomNum")
                         .HasColumnType("int");
 
-                    b.Property<int>("BedroomNum")
+                    b.Property<int?>("BedroomNum")
                         .HasColumnType("int");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("City")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Garden")
+                    b.Property<bool?>("Garden")
                         .HasColumnType("bit");
 
-                    b.Property<int>("KitchenNum")
+                    b.Property<int?>("KitchenNum")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OfferType")
+                    b.Property<int?>("OfferType")
                         .HasColumnType("int");
 
-                    b.Property<string>("PhotoPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Price")
+                    b.Property<int?>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("PropertyType")
+                    b.Property<int?>("PropertyType")
                         .HasColumnType("int");
 
-                    b.Property<bool>("SecuritySystem")
+                    b.Property<bool?>("SecuritySystem")
                         .HasColumnType("bit");
 
-                    b.Property<double>("Space")
+                    b.Property<double?>("Space")
                         .HasColumnType("float");
 
-                    b.Property<bool>("SwimmingPool")
+                    b.Property<bool?>("SwimmingPool")
                         .HasColumnType("bit");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("RealEstates");
                 });
@@ -335,15 +323,6 @@ namespace RealEstateApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("RealEstateApi.Models.RealEstate", b =>
-                {
-                    b.HasOne("RealEstateApi.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

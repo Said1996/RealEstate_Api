@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RealEstateApi.Models;
 using RealEstateApi.Models.Context;
 using RealEstateApi.Models.Request;
+using RealEstateApi.Models.Response;
 using RealEstateApi.Service.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -13,78 +16,148 @@ namespace RealEstateApi.Service
     public class RealEstateService : IRealEstateService
     {
         private readonly AppDbContext appDbContext;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IMapper mapper;
 
-        public RealEstateService(AppDbContext appDbContext)
+        public RealEstateService(AppDbContext appDbContext, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             this.appDbContext = appDbContext;
+            this.userManager = userManager;
+            this.mapper = mapper;
         }
 
-        public async Task<List<RealEstate>> GetAllRealEstateAsync(PaginationParameter paginationParameter)
+        public async Task<List<RealEstateResponse>> GetAllRealEstateAsync(PaginationParameter paginationParameter)
         {
-            return await appDbContext.RealEstates
+            return await appDbContext.RealEstates.Select(s => new RealEstateResponse()
+            {
+                Id = s.Id,
+                Name = s.Name,
+                PhotoPath = s.PhotoPath,
+                Description = s.Description,
+                Address = s.Address,
+                Country = s.Country,
+                City = s.City,
+                Price = s.Price,
+                Space = s.Space,
+                BathroomNum = s.BathroomNum,
+                BedroomNum = s.BedroomNum,
+                KitchenNum = s.KitchenNum,
+                PropertyType = s.PropertyType,
+                OfferType = s.OfferType,
+                SwimmingPool = s.SwimmingPool,
+                SecuritySystem = s.SecuritySystem,
+                Garden = s.Garden,
+                UserName = s.User.Name,
+                UserPhotoPath = s.User.PhotoPath,
+                UserPhoneNumber = s.User.PhoneNumber,
+            })
                     .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
                     .Take(paginationParameter.PageSize)
                     .ToListAsync();
         }
 
-        public async Task<RealEstate> GetRealEstateAsync(int id)
+        public async Task<RealEstateResponse> GetRealEstateAsync(int id)
         {
-            return await appDbContext.RealEstates.FirstOrDefaultAsync(r => r.Id == id);
+            return await appDbContext.RealEstates.Select(s => new RealEstateResponse()
+            {
+                Id = s.Id,
+                Name = s.Name,
+                PhotoPath = s.PhotoPath,
+                Description = s.Description,
+                Address = s.Address,
+                Country = s.Country,
+                City = s.City,
+                Price = s.Price,
+                Space = s.Space,
+                BathroomNum = s.BathroomNum,
+                BedroomNum = s.BedroomNum,
+                KitchenNum = s.KitchenNum,
+                PropertyType = s.PropertyType,
+                OfferType = s.OfferType,
+                SwimmingPool = s.SwimmingPool,
+                SecuritySystem = s.SecuritySystem,
+                Garden = s.Garden,
+                UserName = s.User.Name,
+                UserPhotoPath = s.User.PhotoPath,
+                UserPhoneNumber = s.User.PhoneNumber,
+            })
+            .FirstOrDefaultAsync();
         }
 
-        public async Task<RealEstate> PostRealEstateAsync(RealEstate realEstate)
+        public async Task<RealEstateModel> PostRealEstateAsync(RealEstateModel realEstateModel, string userId)
         {
+            var realEstate = mapper.Map<RealEstate>(realEstateModel);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            realEstate.User = user;
             await appDbContext.RealEstates.AddAsync(realEstate);
-            appDbContext.SaveChanges();
-            return realEstate;
+            await appDbContext.SaveChangesAsync();
+            return realEstateModel;
         }
 
         public async Task<bool> DeleteRealEstateAsync(int id)
         {
-            var realEstate = await GetRealEstateAsync(id);
-            if (realEstate == null)
-                return false;
-
-            appDbContext.RealEstates.Remove(realEstate);
-            appDbContext.SaveChanges();
+            var result = appDbContext.Remove(new RealEstate() { Id = id });
+            await appDbContext.SaveChangesAsync();
             return true;
 
         }
 
-        public async Task<RealEstate> UpdateRealEstateAsync(RealEstate realEstate)
+        public async Task<RealEstateModel> UpdateRealEstateAsync(RealEstateModel realEstateModel)
         {
-            var realEstateToModify = await appDbContext.RealEstates.FirstOrDefaultAsync(r => r.Id == realEstate.Id);
-            if (realEstateToModify == null)
+            var realEstate = await appDbContext.RealEstates.FirstOrDefaultAsync(r => r.Id == realEstateModel.Id);
+            if (realEstate == null)
                 return null;
 
-            realEstateToModify.Name = realEstate.Name;
-            realEstateToModify.Description = realEstate.Description;
-            realEstateToModify.Price = realEstate.Price;
-            realEstateToModify.BedroomNum = realEstate.BedroomNum;
-            realEstateToModify.KitchenNum = realEstate.KitchenNum;
-            realEstateToModify.PropertyType = realEstate.PropertyType;
-            realEstateToModify.Space = realEstate.Space;
-            realEstateToModify.SwimmingPool = realEstate.SwimmingPool;
-            realEstateToModify.SecuritySystem = realEstate.SecuritySystem;
-            realEstateToModify.OfferType = realEstate.OfferType;
-            realEstateToModify.BathroomNum = realEstate.BathroomNum;
-            realEstateToModify.City = realEstate.City;
-            realEstateToModify.Garden = realEstate.Garden;
+            realEstate = mapper.Map<RealEstate>(realEstateModel);
 
             await appDbContext.SaveChangesAsync();
 
-            return realEstateToModify;
+            return realEstateModel;
         }
 
-        public IQueryable<RealEstate> Search(FilterParameter filterParameter, PaginationParameter paginationParameter)
+        public (IQueryable<RealEstateResponse> query, PaginationInformation pagination) Search(FilterParameter filterParameter, PaginationParameter paginationParameter)
         {
-            var query = appDbContext.RealEstates.AsQueryable();
-            query = Filters(filterParameter, query);
 
-            return query;
+
+            var query = appDbContext.RealEstates.Select(s => new RealEstateResponse()
+            {
+                Id = s.Id,
+                Name = s.Name,
+                PhotoPath = s.PhotoPath,
+                Description = s.Description,
+                Address = s.Address,
+                Country = s.Country,
+                City = s.City,
+                Price = s.Price,
+                Space = s.Space,
+                BathroomNum = s.BathroomNum,
+                BedroomNum = s.BedroomNum,
+                KitchenNum = s.KitchenNum,
+                PropertyType = s.PropertyType,
+                OfferType = s.OfferType,
+                SwimmingPool = s.SwimmingPool,
+                SecuritySystem = s.SecuritySystem,
+                Garden = s.Garden,
+                UserName = s.User.Name,
+                UserPhotoPath = s.User.PhotoPath,
+                UserPhoneNumber = s.User.PhoneNumber,
+            });
+            query = Filters(filterParameter, query);
+            query.OrderBy(r => r.Address)
+               .Skip(paginationParameter.PageSize * (paginationParameter.PageNumber - 1))
+               .Take(paginationParameter.PageSize);
+
+            var metadata = new PaginationInformation()
+            {
+                PageNumber = paginationParameter.PageNumber,
+                TotalCount = query.Count(),
+                TotalPages = TotalPages(query.Count(), paginationParameter.PageSize)
+            };
+
+            return (query, metadata);
         }
 
-        public int TotalPages(int totalCount, int pageSize)
+        private int TotalPages(int totalCount, int pageSize)
         {
             var result = 0;
             var totalPages = Math.DivRem(totalCount, pageSize, out result);
@@ -93,13 +166,19 @@ namespace RealEstateApi.Service
             return totalPages;
         }
 
-        private IQueryable<RealEstate> Filters(FilterParameter filterParameter, IQueryable<RealEstate> query)
+        private IQueryable<RealEstateResponse> Filters(FilterParameter filterParameter, IQueryable<RealEstateResponse> query)
         {
             if (!string.IsNullOrEmpty(filterParameter?.Search))
                 query = query.Where(r => r.Name.Contains(filterParameter.Search));
 
-            if (filterParameter.City != null)
+            if (!string.IsNullOrEmpty(filterParameter?.Address))
+                query = query.Where(r => r.City == filterParameter.Address);
+
+            if (!string.IsNullOrEmpty(filterParameter?.City))
                 query = query.Where(r => r.City == filterParameter.City);
+
+            if (!string.IsNullOrEmpty(filterParameter?.Country))
+                query = query.Where(r => r.City == filterParameter.Country);
 
             if (filterParameter?.Price != null)
                 query = query.Where(r => r.Price == filterParameter.Price);
@@ -124,9 +203,6 @@ namespace RealEstateApi.Service
 
             if (filterParameter?.BathroomNum != null)
                 query = query.Where(r => r.BathroomNum == filterParameter.BathroomNum);
-
-            if (filterParameter?.City != null)
-                query = query.Where(r => r.City == filterParameter.City);
 
             if (filterParameter?.PropertyType != null)
                 query = query.Where(r => r.PropertyType == filterParameter.PropertyType);
