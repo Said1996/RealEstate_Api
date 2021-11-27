@@ -58,7 +58,7 @@ namespace RealEstateApi.Controllers.V1
             }
         }
 
-        //[Authorize(Roles = "Admin, Moderator")]
+        [Authorize(Roles = "Admin, Moderator")]
         [HttpPost]
         public async Task<ActionResult<RealEstateModel>> PostRealEstate(RealEstateModel realEstateModel)
         {
@@ -81,7 +81,7 @@ namespace RealEstateApi.Controllers.V1
             }
         }
 
-        //[Authorize(Roles = "Admin, Moderator")]
+        [Authorize(Roles = "Admin, Moderator")]
         [HttpDelete("{id:int}")]
         public async Task<ActionResult<RealEstateModel>> DeleteRealEstate(int id)
         {
