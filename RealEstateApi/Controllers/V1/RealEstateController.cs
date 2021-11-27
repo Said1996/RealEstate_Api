@@ -22,7 +22,6 @@ namespace RealEstateApi.Controllers.V1
 
         public RealEstateController(IRealEstateService realEstateService)
         {
-
             this.realEstateService = realEstateService;
         }
 

@@ -80,8 +80,8 @@ namespace RealEstateApi.Service
                 authenticationModel.FullName = user.Name;
                 authenticationModel.PhoneNumber = user.PhoneNumber;
                 authenticationModel.PhotoPath = user.PhotoPath;
-                //var rolesList = await userManager.GetRolesAsync(user).ConfigureAwait(false);
-                //authenticationModel.Roles = rolesList.ToList();
+                var rolesList = await userManager.GetRolesAsync(user).ConfigureAwait(false);
+                authenticationModel.Roles = rolesList.ToList();
                 return authenticationModel;
             }
 
