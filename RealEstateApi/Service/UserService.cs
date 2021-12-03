@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -21,17 +22,50 @@ namespace RealEstateApi.Service
     public class UserService : IUserService
     {
         private readonly AppDbContext context;
+        private readonly IMapper mapper;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly JWT Jwt;
 
-        public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, AppDbContext context)
+        public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
+            IOptions<JWT> jwt, AppDbContext context, IMapper mapper)
         {
 
             this.context = context;
+            this.mapper = mapper;
             this.userManager = userManager;
             this.roleManager = roleManager;
             Jwt = jwt.Value;
+        }
+
+        public async Task<UserModel> GetUserAsync(string id)
+        {
+
+            var applicationUser = await context.Users.Where(u => u.Id == id)
+                .Include(u => u.RealEstates)
+                .FirstOrDefaultAsync();
+            var userModel = new UserModel();
+
+            userModel.FullName = applicationUser.Name;
+            userModel.Email = applicationUser.Email;
+            userModel.IsAuthenticated = applicationUser.EmailConfirmed;
+            userModel.PhoneNumber = applicationUser.PhoneNumber;
+            userModel.PhotoPath = applicationUser.PhotoPath;
+            userModel.UserRealEstatesOffer = mapper.Map<ICollection<RealEstateModel>>(applicationUser.RealEstates);
+
+            return userModel;
+
+        }
+
+        public async Task UpdateUserAsync(UserModel userModel)
+        {
+            var user = await userManager.FindByEmailAsync(userModel.Email);
+            user.Name = userModel.FullName;
+            user.PhoneNumber = userModel.PhoneNumber;
+            user.PhotoPath = userModel.PhotoPath;
+
+            await userManager.UpdateAsync(user);
+
         }
 
         public async Task<string> RegisterAsync(RegisterModel model)
@@ -80,7 +114,8 @@ namespace RealEstateApi.Service
                 authenticationModel.FullName = user.Name;
                 authenticationModel.PhoneNumber = user.PhoneNumber;
                 authenticationModel.PhotoPath = user.PhotoPath;
-                var rolesList = await userManager.GetRolesAsync(user).ConfigureAwait(false);
+                authenticationModel.Expiry = DateTime.Now.AddMinutes(Jwt.DurationInMinutes);
+                var rolesList = await userManager.GetRolesAsync(user);
                 authenticationModel.Roles = rolesList.ToList();
                 return authenticationModel;
             }

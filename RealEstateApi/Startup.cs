@@ -137,6 +137,7 @@ namespace RealEstateApi
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
             app.UseCors();

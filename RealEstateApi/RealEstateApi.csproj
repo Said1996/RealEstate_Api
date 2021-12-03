@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="Settings\" />
+    <Folder Include="wwwroot\Resources\Images\" />
   </ItemGroup>
 
   <ItemGroup>

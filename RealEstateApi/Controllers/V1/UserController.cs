@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealEstateApi.Models.Request;
+using RealEstateApi.Models.Response;
 using RealEstateApi.Service.Interfaces;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RealEstateApi.Controllers.V1
@@ -17,14 +19,22 @@ namespace RealEstateApi.Controllers.V1
             this.userService = userService;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
-        public async Task<ActionResult> GetAllUsers()
+        public async Task<ActionResult<UserModel>> GetUser()
         {
-            var result = await userService.GetAllUsersAsync();
+            var id = User.Claims.SingleOrDefault(c => c.Type == "uid").Value;
+            var result = await userService.GetUserAsync(id);
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser(UserModel userModel)
+        {
+            await userService.UpdateUserAsync(userModel);
+            return Ok();
+        }
 
 
         [HttpPost("Register")]
@@ -41,12 +51,7 @@ namespace RealEstateApi.Controllers.V1
             return Ok(result);
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> UserInfo(TokenRequestModel tokenRequestModel)
-        //{
-        //    var result = await userService.GetUserInfo(tokenRequestModel);
-        //    return Ok(result);
-        //}
+
 
         [Authorize(Roles = "Admin")]
         [HttpPost("CreateRole")]
@@ -56,7 +61,7 @@ namespace RealEstateApi.Controllers.V1
             return Ok();
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("AddRoleToUser")]
         public async Task<ActionResult> AddRoleToUserAsync(AddRoleModel addRoleModel)
         {
