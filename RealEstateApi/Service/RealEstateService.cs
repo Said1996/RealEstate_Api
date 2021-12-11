@@ -169,16 +169,25 @@ namespace RealEstateApi.Service
         private IQueryable<RealEstateResponse> Filters(FilterParameter filterParameter, IQueryable<RealEstateResponse> query)
         {
             if (!string.IsNullOrEmpty(filterParameter?.Search))
-                query = query.Where(r => r.Name.Contains(filterParameter.Search));
+            {
+                var titleQuery = query.Where(r => r.Name.Contains(filterParameter.Search));
+
+                var countryQuery = query.Where(r => r.Country.Contains(filterParameter.Search));
+                var cityQuery = query.Where(r => r.City.Contains(filterParameter.Search));
+                var addressQuery = query.Where(r => r.Address.Contains(filterParameter.Search));
+
+                query = titleQuery.Union(countryQuery).Union(cityQuery).Union(addressQuery);
+
+            }
 
             if (!string.IsNullOrEmpty(filterParameter?.Address))
-                query = query.Where(r => r.City == filterParameter.Address);
+                query = query.Where(r => r.Address == filterParameter.Address);
 
             if (!string.IsNullOrEmpty(filterParameter?.City))
                 query = query.Where(r => r.City == filterParameter.City);
 
             if (!string.IsNullOrEmpty(filterParameter?.Country))
-                query = query.Where(r => r.City == filterParameter.Country);
+                query = query.Where(r => r.Country == filterParameter.Country);
 
             if (filterParameter?.Price != null)
                 query = query.Where(r => r.Price == filterParameter.Price);

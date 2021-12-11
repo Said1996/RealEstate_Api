@@ -38,17 +38,20 @@ namespace RealEstateApi.Controllers.V1
 
 
         [HttpPost("Register")]
-        public async Task<ActionResult> RegisterUserAsync(RegisterModel registerModel)
+        public async Task<ActionResult<string>> RegisterUserAsync(RegisterModel registerModel)
         {
             var result = await userService.RegisterAsync(registerModel);
             return Ok(result);
         }
 
         [HttpPost("SignIn")]
-        public async Task<IActionResult> SignIn(TokenRequestModel tokenRequestModel)
+        public async Task<ActionResult<AuthenticationModel>> SignIn(TokenRequestModel tokenRequestModel)
         {
             var result = await userService.GetTokenAsync(tokenRequestModel);
-            return Ok(result);
+            if (result.IsSuccessful)
+                return Ok(result);
+            else
+                return BadRequest(result);
         }
 
 
@@ -63,7 +66,7 @@ namespace RealEstateApi.Controllers.V1
 
         [Authorize(Roles = "Admin")]
         [HttpPost("AddRoleToUser")]
-        public async Task<ActionResult> AddRoleToUserAsync(AddRoleModel addRoleModel)
+        public async Task<ActionResult<string>> AddRoleToUserAsync(AddRoleModel addRoleModel)
         {
             var result = await userService.AddRoleToUserAsync(addRoleModel);
             return Ok(result);

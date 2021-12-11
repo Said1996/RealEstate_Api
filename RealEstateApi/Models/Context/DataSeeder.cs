@@ -16,53 +16,55 @@ namespace RealEstateApi.Models.Context
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "said",
-                Email = "said@outlook.com",
-                UserName = "said@outlook.com",
-                NormalizedEmail = "said@outlook.com".ToUpper(),
-                NormalizedUserName = "said@outlook.com".ToUpper(),
+                Email = "said.amir.kattan@outlook.com",
+                UserName = "said.amir.kattan@outlook.com",
+                NormalizedEmail = "said.amir.kattan@outlook.com".ToUpper(),
+                NormalizedUserName = "said.amir.kattan@outlook.com".ToUpper(),
                 PhoneNumber = "01231231322",
                 EmailConfirmed = true
 
             };
+
+
+
+            var role = new IdentityRole()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Admin",
+                NormalizedName = "ADMIN",
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            };
+            var role2 = new IdentityRole()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Moderator",
+                NormalizedName = "Moderator".ToUpper(),
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            };
+            var role3 = new IdentityRole()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "User",
+                NormalizedName = "USER",
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            };
+
+
+
             if (!userManager.Users.Any())
             {
-                userManager.CreateAsync(adminUser, "aA@44781680").Wait();
-
+                userManager.CreateAsync(adminUser, "aaa111!!!AAA").Wait();
             }
+
             if (!roleManager.Roles.Any())
             {
-
-
-                var role = new IdentityRole()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "Admin",
-                    NormalizedName = "ADMIN",
-                    ConcurrencyStamp = Guid.NewGuid().ToString()
-                };
-                var role2 = new IdentityRole()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "Moderator",
-                    NormalizedName = "Moderator".ToUpper(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString()
-                };
-                var role3 = new IdentityRole()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "User",
-                    NormalizedName = "USER",
-                    ConcurrencyStamp = Guid.NewGuid().ToString()
-                };
-
                 roleManager.CreateAsync(role).Wait();
-
                 roleManager.CreateAsync(role2).Wait();
                 roleManager.CreateAsync(role3).Wait();
-
                 userManager.AddToRoleAsync(adminUser, "Admin").Wait();
-
             }
+
+
         }
     }
 }
